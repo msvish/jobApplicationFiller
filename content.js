@@ -78,37 +78,35 @@ const FIELD_PATTERNS = {
   },
 
   school: {
-    id: /\bschool\b|\bcollege\b|\binstitution\b|\buniversity\b/i,
-    name: /school/i,
+    id: /(?:^|_|-)(school)(?:$|_|-)/i,
+    name: /(?:^|_|-)(school)(?:$|_|-)/i,
     placeholder: /school/i,
     label: /school/i,
     class: /school/i,
   },
-
   degree: {
-    id: /degree|qualification/i,
-    name: /degree|qualification/i,
-    placeholder: /degree|qualification/i,
-    label: /degree|qualification/i,
-    class: /degree|qualification/i,
+    id: /(?:^|_|-)(degree|qualification|edu.*level|academic.*level)(?:$|_|-)/i,
+    name: /(?:^|_|-)(degree|qualification|edu.*level|academic.*level)(?:$|_|-)/i,
+    placeholder: /degree|qualification|education level|academic level/i,
+    label: /degree|qualification|education level|academic level/i,
+    class:
+      /(?:^|_|-)(degree|qualification|edu.*level|academic.*level)(?:$|_|-)/i,
   },
-
   discipline: {
-    id: /discipline|field.*study|subject|specialization/i,
-    name: /discipline|field.*study|subject|specialization/i,
-    placeholder: /discipline|field.*study|subject|specialization/i,
-    label: /discipline|field.*study|subject|specialization/i,
-    class: /discipline|field.*study|subject|specialization/i,
+    id: /(?:^|_|-)(discipline|field.*study|subject|speciali[sz]ation)(?:$|_|-)/i,
+    name: /(?:^|_|-)(discipline|field.*study|subject|speciali[sz]ation)(?:$|_|-)/i,
+    placeholder: /discipline|field of study|subject|specialization/i,
+    label: /discipline|field of study|subject|specialization/i,
+    class:
+      /(?:^|_|-)(discipline|field.*study|subject|speciali[sz]ation)(?:$|_|-)/i,
   },
-
   major: {
-    id: /major/i,
-    name: /major/i,
-    placeholder: /major/i,
-    label: /major/i,
-    class: /major/i,
+    id: /(?:^|_|-)(major|concentration|program)(?:$|_|-)/i,
+    name: /(?:^|_|-)(major|concentration|program)(?:$|_|-)/i,
+    placeholder: /major|concentration|program/i,
+    label: /major|concentration|program/i,
+    class: /(?:^|_|-)(major|concentration|program)(?:$|_|-)/i,
   },
-
   // // Password patterns
   // password: {
   //   id: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
