@@ -84,6 +84,7 @@ const FIELD_PATTERNS = {
     label: /school/i,
     class: /school/i,
   },
+
   degree: {
     id: /(?:^|_|-)(degree|qualification|edu.*level|academic.*level)(?:$|_|-)/i,
     name: /(?:^|_|-)(degree|qualification|edu.*level|academic.*level)(?:$|_|-)/i,
@@ -92,6 +93,7 @@ const FIELD_PATTERNS = {
     class:
       /(?:^|_|-)(degree|qualification|edu.*level|academic.*level)(?:$|_|-)/i,
   },
+
   discipline: {
     id: /(?:^|_|-)(discipline|field.*study|subject|speciali[sz]ation)(?:$|_|-)/i,
     name: /(?:^|_|-)(discipline|field.*study|subject|speciali[sz]ation)(?:$|_|-)/i,
@@ -100,6 +102,7 @@ const FIELD_PATTERNS = {
     class:
       /(?:^|_|-)(discipline|field.*study|subject|speciali[sz]ation)(?:$|_|-)/i,
   },
+
   major: {
     id: /(?:^|_|-)(major|concentration|program)(?:$|_|-)/i,
     name: /(?:^|_|-)(major|concentration|program)(?:$|_|-)/i,
@@ -107,6 +110,39 @@ const FIELD_PATTERNS = {
     label: /major|concentration|program/i,
     class: /(?:^|_|-)(major|concentration|program)(?:$|_|-)/i,
   },
+
+  startMonth: {
+    id: /(?:^|_|-)(start.*month|from.*month|begin.*month)(?:$|_|-)?/i,
+    name: /(?:^|_|-)(start.*month|from.*month|begin.*month)(?:$|_|-)?/i,
+    placeholder: /start\s*month|from\s*month|begin\s*month/i,
+    label: /start\s*month|from\s*month|begin\s*month/i,
+    class: /(?:^|_|-)(start.*month|from.*month|begin.*month)(?:$|_|-)?/i,
+  },
+
+  startYear: {
+    id: /(?:^|_|-)(start.*year|from.*year|begin.*year)(?:$|_|-)?/i,
+    name: /(?:^|_|-)(start.*year|from.*year|begin.*year)(?:$|_|-)?/i,
+    placeholder: /start\s*year|from\s*year|begin\s*year/i,
+    label: /start\s*year|from\s*year|begin\s*year/i,
+    class: /(?:^|_|-)(start.*year|from.*year|begin.*year)(?:$|_|-)?/i,
+  },
+
+  endMonth: {
+    id: /(?:^|_|-)(end.*month|to.*month|finish.*month)(?:$|_|-)?/i,
+    name: /(?:^|_|-)(end.*month|to.*month|finish.*month)(?:$|_|-)?/i,
+    placeholder: /end\s*month|to\s*month|finish\s*month/i,
+    label: /end\s*month|to\s*month|finish\s*month/i,
+    class: /(?:^|_|-)(end.*month|to.*month|finish.*month)(?:$|_|-)?/i,
+  },
+
+  endYear: {
+    id: /(?:^|_|-)(end.*year|to.*year|finish.*year)(?:$|_|-)?/i,
+    name: /(?:^|_|-)(end.*year|to.*year|finish.*year)(?:$|_|-)?/i,
+    placeholder: /end\s*year|to\s*year|finish\s*year/i,
+    label: /end\s*year|to\s*year|finish\s*year/i,
+    class: /(?:^|_|-)(end.*year|to.*year|finish.*year)(?:$|_|-)?/i,
+  },
+
   // // Password patterns
   // password: {
   //   id: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
@@ -161,6 +197,10 @@ const autofillData = {
   school: "University of Michigan - Dearborn",
   degree: "Master's Degree",
   discipline: "Computer Science",
+  startMonth: "September",
+  startYear: 2024,
+  endMonth: "May",
+  endYear: 2025,
   linkedin: "https://www.linkedin.com/in/msvishal",
   website: "https://vishalms.com",
 };
