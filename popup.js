@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         if (tabs && tabs[0] && tabs[0].id) {
           console.log("Active tab ID:", tabs[0].id);
-
           chrome.tabs.sendMessage(
             tabs[0].id,
             { action: "autofill" },
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
               } else {
                 console.log("Autofill response:", response);
               }
-
               setTimeout(() => {
                 button.disabled = false;
                 button.textContent = "Click";

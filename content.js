@@ -55,7 +55,7 @@ const FIELD_PATTERNS = {
     id: /(?:^|_|-)(?:city|town|locale)(?:$|_|-)/i,
     name: /(?:^|_|-)(?:city|town|locale)(?:$|_|-)/i,
     placeholder: /(?:^|[\s,])(?:city|town|locale)(?:$|[\s,])/i,
-    label: /city|town|locale/i,
+    label: /^(city|current\s+city|residence\s+city)$/i,
     class: /(?:^|_|-)(?:city|town|locale)(?:$|_|-)/i,
   },
 
@@ -77,26 +77,58 @@ const FIELD_PATTERNS = {
     class: /(?:^|_|-)(?:zip|postal|post)[_-]?(?:code)?(?:$|_|-)/i,
   },
 
-  // Password patterns
-  password: {
-    id: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
-    name: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
-    type: /^password$/i,
-    placeholder: /(?:^|[\s,])(?:password|passwd|pwd|pass)(?:$|[\s,])/i,
-    label: /password|passwd|pwd|pass/i,
-    class: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
+  school: {
+    id: /\bschool\b|\bcollege\b|\binstitution\b|\buniversity\b/i,
+    name: /school/i,
+    placeholder: /school/i,
+    label: /school/i,
+    class: /school/i,
   },
 
-  // Username patterns
-  username: {
-    id: /(?:^|_|-)(?:username|userid|user[_-]?name|user[_-]?id|login)(?:$|_|-)/i,
-    name: /(?:^|_|-)(?:username|userid|user[_-]?name|user[_-]?id|login)(?:$|_|-)/i,
-    placeholder:
-      /(?:^|[\s,])(?:username|userid|user\s+name|user\s+id|login)(?:$|[\s,])/i,
-    label: /username|user\s+name|user\s+id|login\s+id/i,
-    class:
-      /(?:^|_|-)(?:username|userid|user[_-]?name|user[_-]?id|login)(?:$|_|-)/i,
+  degree: {
+    id: /degree|qualification/i,
+    name: /degree|qualification/i,
+    placeholder: /degree|qualification/i,
+    label: /degree|qualification/i,
+    class: /degree|qualification/i,
   },
+
+  discipline: {
+    id: /discipline|field.*study|subject|specialization/i,
+    name: /discipline|field.*study|subject|specialization/i,
+    placeholder: /discipline|field.*study|subject|specialization/i,
+    label: /discipline|field.*study|subject|specialization/i,
+    class: /discipline|field.*study|subject|specialization/i,
+  },
+
+  major: {
+    id: /major/i,
+    name: /major/i,
+    placeholder: /major/i,
+    label: /major/i,
+    class: /major/i,
+  },
+
+  // // Password patterns
+  // password: {
+  //   id: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
+  //   name: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
+  //   type: /^password$/i,
+  //   placeholder: /(?:^|[\s,])(?:password|passwd|pwd|pass)(?:$|[\s,])/i,
+  //   label: /password|passwd|pwd|pass/i,
+  //   class: /(?:^|_|-)(?:password|passwd|pwd|pass)(?:$|_|-)/i,
+  // },
+
+  // // Username patterns
+  // username: {
+  //   id: /(?:^|_|-)(?:username|userid|user[_-]?name|user[_-]?id|login)(?:$|_|-)/i,
+  //   name: /(?:^|_|-)(?:username|userid|user[_-]?name|user[_-]?id|login)(?:$|_|-)/i,
+  //   placeholder:
+  //     /(?:^|[\s,])(?:username|userid|user\s+name|user\s+id|login)(?:$|[\s,])/i,
+  //   label: /username|user\s+name|user\s+id|login\s+id/i,
+  //   class:
+  //     /(?:^|_|-)(?:username|userid|user[_-]?name|user[_-]?id|login)(?:$|_|-)/i,
+  // },
 
   // LinkedIn Profile patterns
   linkedin: {
@@ -128,13 +160,15 @@ const autofillData = {
   city: "Dearborn",
   state: "Michigan",
   zipCode: "48126",
-  linkedin: "https://www.linkedin.com/in/vishal-m-s-71373a147",
+  school: "University of Michigan - Dearborn",
+  degree: "Master's Degree",
+  discipline: "Computer Science",
+  linkedin: "https://www.linkedin.com/in/msvishal",
   website: "https://vishalms.com",
 };
 
 // Function to detect field type based on its attributes
 function detectFieldType(field) {
-  // Get all relevant attributes
   const attributes = {
     id: field.id || "",
     name: field.name || "",
@@ -142,23 +176,6 @@ function detectFieldType(field) {
     placeholder: field.placeholder || "",
     type: field.type || "",
   };
-
-  // Collect all data attributes that might contain field identifiers
-  const dataAttributes = {};
-  if (field.dataset) {
-    Object.keys(field.dataset).forEach((key) => {
-      dataAttributes[key] = field.dataset[key];
-    });
-  }
-
-  // Check for custom attributes like contact_information_id
-  const customAttributes = {};
-  for (let i = 0; i < field.attributes.length; i++) {
-    const attr = field.attributes[i];
-    if (!["id", "name", "class", "placeholder", "type"].includes(attr.name)) {
-      customAttributes[attr.name] = attr.value;
-    }
-  }
 
   // Try to find associated label text
   let labelText = "";
@@ -169,7 +186,6 @@ function detectFieldType(field) {
     }
   });
 
-  // If no direct label found, try to find nearby label
   if (!labelText && field.parentElement) {
     const parentLabel = field.parentElement.querySelector("label");
     if (parentLabel) {
@@ -177,149 +193,47 @@ function detectFieldType(field) {
     }
   }
 
-  // Check each field pattern against all attributes
+  // Strict field matching using defined patterns
   for (const [fieldType, patterns] of Object.entries(FIELD_PATTERNS)) {
-    // Check ID attribute
-    if (attributes.id && patterns.id && patterns.id.test(attributes.id)) {
-      console.log(`Field ${attributes.id} identified as ${fieldType} by ID`);
+    if (patterns.id && patterns.id.test(attributes.id)) {
+      console.log(` Matched [${fieldType}] by id: ${attributes.id}`);
       return fieldType;
     }
-
-    // Check name attribute
-    if (
-      attributes.name &&
-      patterns.name &&
-      patterns.name.test(attributes.name)
-    ) {
-      console.log(
-        `Field ${attributes.name} identified as ${fieldType} by name`
-      );
+    if (patterns.name && patterns.name.test(attributes.name)) {
+      console.log(` Matched [${fieldType}] by name: ${attributes.name}`);
       return fieldType;
     }
-
-    // Check className attribute
-    if (
-      attributes.className &&
-      patterns.class &&
-      patterns.class.test(attributes.className)
-    ) {
-      console.log(
-        `Field with class ${attributes.className} identified as ${fieldType} by class`
-      );
+    if (patterns.class && patterns.class.test(attributes.className)) {
+      console.log(`Matched [${fieldType}] by class: ${attributes.className}`);
       return fieldType;
     }
-
-    // Check placeholder attribute
     if (
-      attributes.placeholder &&
       patterns.placeholder &&
       patterns.placeholder.test(attributes.placeholder)
     ) {
       console.log(
-        `Field with placeholder "${attributes.placeholder}" identified as ${fieldType} by placeholder`
+        ` Matched [${fieldType}] by placeholder: ${attributes.placeholder}`
       );
       return fieldType;
     }
-
-    // Check input type attribute
-    if (
-      attributes.type &&
-      patterns.type &&
-      patterns.type.test(attributes.type)
-    ) {
-      console.log(
-        `Field with type ${attributes.type} identified as ${fieldType} by type`
-      );
+    if (patterns.type && patterns.type.test(attributes.type)) {
+      console.log(`Matched [${fieldType}] by type: ${attributes.type}`);
       return fieldType;
     }
-
-    // Check associated label text
-    if (labelText && patterns.label && patterns.label.test(labelText)) {
-      console.log(
-        `Field with label "${labelText}" identified as ${fieldType} by label text`
-      );
+    if (patterns.label && labelText && patterns.label.test(labelText)) {
+      console.log(`Matched [${fieldType}] by label: ${labelText}`);
       return fieldType;
-    }
-
-    // NEW: Check data attributes
-    for (const [dataKey, dataValue] of Object.entries(dataAttributes)) {
-      if (typeof dataValue === "string") {
-        // Check if data attribute key matches pattern
-        if (patterns.id && patterns.id.test(dataKey)) {
-          console.log(
-            `Field with data-${dataKey} identified as ${fieldType} by data attribute key`
-          );
-          return fieldType;
-        }
-
-        // Check if data attribute value matches pattern
-        if (patterns.id && patterns.id.test(dataValue)) {
-          console.log(
-            `Field with data-${dataKey}="${dataValue}" identified as ${fieldType} by data attribute value`
-          );
-          return fieldType;
-        }
-      }
-    }
-
-    // NEW: Check custom attributes (like contact_information_id="first_name")
-    for (const [attrName, attrValue] of Object.entries(customAttributes)) {
-      // Check if attribute name matches pattern (like contact_information_id containing "id")
-      if (
-        attrName.includes("id") &&
-        patterns.id &&
-        patterns.id.test(attrName)
-      ) {
-        console.log(
-          `Field with ${attrName} identified as ${fieldType} by custom attribute name`
-        );
-        return fieldType;
-      }
-
-      // Check if attribute value matches pattern (like "first_name")
-      if (
-        typeof attrValue === "string" &&
-        patterns.id &&
-        patterns.id.test(attrValue)
-      ) {
-        console.log(
-          `Field with ${attrName}="${attrValue}" identified as ${fieldType} by custom attribute value`
-        );
-        return fieldType;
-      }
     }
   }
 
-  // If we get here, we couldn't detect the type
-
-  // Final attempt: Look for specific field values directly in the markup
-  // This handles cases like contact_information_id="first_name"
-  for (const [fieldType, patterns] of Object.entries(FIELD_PATTERNS)) {
-    // Convert the field element to a string representation to check for patterns in raw HTML
-    const fieldHtml = field.outerHTML.toLowerCase();
-
-    // Check if any form of "first_name", "lastname", etc. appears in the HTML
-    if (patterns.id) {
-      const patternStr = patterns.id
-        .toString()
-        .replace(/[\[\]\(\)\{\}\\\.\^\$\|\?\*\+]/g, "") // Remove regex special chars
-        .replace(/[ij]/g, ""); // Remove non-signal characters to get core pattern
-
-      if (
-        fieldHtml.includes(fieldType.toLowerCase()) ||
-        (patternStr &&
-          fieldHtml.includes(patternStr.substring(1, patternStr.length - 1)))
-      ) {
-        console.log(
-          `Field identified as ${fieldType} by presence in HTML: ${fieldHtml.substring(
-            0,
-            50
-          )}...`
-        );
-        return fieldType;
-      }
-    }
-  }
+  // Final fallback removed (no outerHTML scanning)
+  console.log(" No match for field:", {
+    id: attributes.id,
+    name: attributes.name,
+    className: attributes.className,
+    placeholder: attributes.placeholder,
+    label: labelText,
+  });
 
   return null;
 }
@@ -329,27 +243,40 @@ function autofillForms() {
   const inputFields = document.querySelectorAll("input, textarea, select");
 
   inputFields.forEach((field) => {
-    // Skip hidden, submit, button, and already filled fields
     if (
       field.type === "hidden" ||
       field.type === "submit" ||
       field.type === "button" ||
       field.type === "file" ||
-      field.value
-    ) {
+      field.value // skip already filled fields
+    )
       return;
-    }
 
     const fieldType = detectFieldType(field);
-    if (fieldType && autofillData[fieldType]) {
-      // Set the value
+
+    // Fill only if type is confidently detected AND defined in data
+    if (
+      fieldType &&
+      Object.prototype.hasOwnProperty.call(autofillData, fieldType)
+    ) {
+      console.log(`Autofilling [${fieldType}]`, {
+        field,
+        value: autofillData[fieldType],
+      });
+
       field.value = autofillData[fieldType];
 
-      // Dispatch events to trigger any listeners
       field.dispatchEvent(new Event("input", { bubbles: true }));
       field.dispatchEvent(new Event("change", { bubbles: true }));
 
-      console.log(`Autofilled ${fieldType} field:`, field);
+      setTimeout(() => (field.style.border = ""), 1500);
+    } else {
+      console.log(`Skipping field`, {
+        field,
+        reason: fieldType
+          ? `No data for fieldType [${fieldType}]`
+          : `Field type not detected`,
+      });
     }
   });
 }
