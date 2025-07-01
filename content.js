@@ -276,6 +276,57 @@ function detectFieldType(field) {
   return null;
 }
 
+async function uploadResume() {
+  const resumeFileURL = chrome.runtime.getURL("assets/Vishal_Resume.pdf");
+
+  let inputToUse = null;
+  const fileInputs = Array.from(
+    document.querySelectorAll('input[type="file"]')
+  );
+  const resumeRegex = /resume|cv|upload\s?(file|document)?|select\s?file/i;
+
+  const response = await fetch(resumeFileURL);
+  const blob = await response.blob();
+  const file = new File([blob], "Vishal_Resume.pdf", { type: blob.type });
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+
+  for (const input of fileInputs) {
+    if (input.files?.length) continue;
+
+    // Step 1: Match id, name, class (even if unlikely in your case)
+    const attrs = [input.id, input.name, input.className]
+      .filter(Boolean)
+      .join(" ");
+    if (resumeRegex.test(attrs)) {
+      inputToUse = input;
+      break;
+    }
+
+    // Step 2: Match parent/sibling text content
+    const parentText = input.closest("div, span")?.textContent || "";
+    const prevText = input.previousElementSibling?.textContent || "";
+    const nextText = input.nextElementSibling?.textContent || "";
+    const combined = `${parentText} ${prevText} ${nextText}`.toLowerCase();
+
+    if (resumeRegex.test(combined)) {
+      inputToUse = input;
+      break;
+    }
+  }
+
+  if (!inputToUse) {
+    console.warn("No resume file input found.");
+    return;
+  }
+
+  // Inject the file
+  inputToUse.files = dataTransfer.files;
+  inputToUse.dispatchEvent(new Event("input", { bubbles: true }));
+  inputToUse.dispatchEvent(new Event("change", { bubbles: true }));
+  console.log("Resume uploaded successfully.");
+}
+
 // Function to autofill forms
 function autofillForms() {
   const inputFields = document.querySelectorAll("input, textarea, select");
@@ -306,8 +357,6 @@ function autofillForms() {
 
       field.dispatchEvent(new Event("input", { bubbles: true }));
       field.dispatchEvent(new Event("change", { bubbles: true }));
-
-      setTimeout(() => (field.style.border = ""), 1500);
     } else {
       console.log(`Skipping field`, {
         field,
@@ -329,6 +378,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "autofill") {
     console.log("Autofill triggered by popup button");
     autofillForms();
+    setTimeout(uploadResume, 500);
     sendResponse({ status: "Autofill completed" });
     return true; // Keep the messaging channel open for the async response
   }
