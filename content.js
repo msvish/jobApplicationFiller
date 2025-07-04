@@ -182,6 +182,80 @@ const FIELD_PATTERNS = {
     class: /(?:web|portfolio|site|url)/i,
     type: /^url$/i,
   },
+
+  disability: {
+    id: /disab(ilit(y)?|led)/i,
+    name: /disab(ilit(y)?|led)/i,
+    placeholder: /disab(ilit(y)?|led)/i,
+    label: /do\s+you\s+have\s+a\s+disability|person\s+with\s+disability/i,
+    class: /disab(ilit(y)?|led)/i,
+  },
+
+  sponsorship: {
+    id: /sponsor(ship)?|require.*visa/i,
+    name: /sponsor(ship)?|require.*visa/i,
+    placeholder: /require.*sponsorship|visa/i,
+    label: /require\s+sponsorship|will\s+you\s+require\s+visa/i,
+    class: /sponsor(ship)?|visa/i,
+  },
+
+  authorization: {
+    id: /\bauthoriz(e|ation)[-_ ]?(to)?[-_ ]?work\b/i,
+    name: /\bauthoriz(e|ation)[-_ ]?(to)?[-_ ]?work\b/i,
+    placeholder: /\bauthoriz(e|ation)[-_ ]?(to)?[-_ ]?work\b/i,
+    label:
+      /(?:legally\s*)?(authoriz(e|ation)|eligible|right)\s+(to\s+)?work.*(in\s+(the\s+)?u\.?s\.?|united\s+states)?/i,
+    class: /\bauthoriz(e|ation)[-_ ]?(to)?[-_ ]?work\b/i,
+  },
+
+  relocation: {
+    id: /relocat(e|ion)/i,
+    name: /relocat(e|ion)/i,
+    placeholder: /relocat(e|ion)/i,
+    label: /willing\s+to\s+relocate|relocation\s+required/i,
+    class: /relocat(e|ion)/i,
+  },
+
+  veteran: {
+    id: /veteran|military/i,
+    name: /veteran|military/i,
+    placeholder: /veteran|military/i,
+    label: /protected\s+veteran|military\s+status|are\s+you\s+a\s+veteran/i,
+    class: /veteran|military/i,
+  },
+
+  race: {
+    id: /race|ethnic/i,
+    name: /race|ethnic/i,
+    placeholder: /race|ethnic/i,
+    label: /racial\s+group|ethnicity|select\s+your\s+race/i,
+    class: /race|ethnic/i,
+  },
+
+  ethnicity: {
+    id: /hispanic|latino/i,
+    name: /hispanic|latino|ethnic/i,
+    placeholder: /hispanic|latino|ethnic/i,
+    label:
+      /are\s+you\s+hispanic|do\s+you\s+identify\s+as\s+hispanic|ethnic\s+origin/i,
+    class: /hispanic|latino|ethnic/i,
+  },
+
+  gender: {
+    id: /gender|sex/i,
+    name: /gender|sex/i,
+    placeholder: /gender|sex/i,
+    label: /please\s+select\s+your\s+gender|sex\s+assigned/i,
+    class: /gender|sex/i,
+  },
+
+  startDate: {
+    id: /start.*date|availability/i,
+    name: /start.*date|availability/i,
+    placeholder: /available\s+start\s+date/i,
+    label: /when\s+can\s+you\s+start|available\s+to\s+begin/i,
+    class: /start.*date|availability/i,
+  },
 };
 
 // Your autofill data - hardcoded since we're not using the storage API anymore
@@ -203,6 +277,15 @@ const autofillData = {
   endYear: 2025,
   linkedin: "https://www.linkedin.com/in/msvishal",
   website: "https://vishalms.com",
+  disability: "No, I do not have a disability",
+  sponsorship: "Yes",
+  authorization: "Yes",
+  relocation: "Yes",
+  veteran: "I am not a protected veteran",
+  race: "No",
+  gender: "Male",
+  startDate: "Immediately",
+  ethnicity: "No",
 };
 
 // Function to detect field type based on its attributes
@@ -316,7 +399,7 @@ async function uploadResume() {
   }
 
   if (!inputToUse) {
-    console.warn("No resume file input found.");
+    console.log("No resume file input found.");
     return;
   }
 
@@ -330,7 +413,6 @@ async function uploadResume() {
 // Function to autofill forms
 function autofillForms() {
   const inputFields = document.querySelectorAll("input, textarea, select");
-
   inputFields.forEach((field) => {
     if (
       field.type === "hidden" ||
