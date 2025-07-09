@@ -1,5 +1,75 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Autofill button handler - single purpose popup
+const fields = [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "address",
+  "city",
+  "state",
+  "zipCode",
+  "school",
+  "degree",
+  "discipline",
+  "startMonth",
+  "startYear",
+  "endMonth",
+  "endYear",
+  "linkedin",
+  "website",
+];
+
+let formData = {};
+let currentStep = 0;
+
+function renderStep() {
+  const content = document.getElementById("content");
+  const field = fields[currentStep];
+  const value = formData[field] || "";
+
+  content.innerHTML = `
+  <input id="fieldInput" placeholder="${field}" value="${value}" />
+  <div class="error" id="errorText"></div>
+  <button id="nextBtn">${
+    currentStep === fields.length - 1 ? "Save" : "Next"
+  }</button>
+`;
+
+  const errorText = document.getElementById("errorText");
+
+  document.getElementById("fieldInput").addEventListener("input", () => {
+    errorText.innerText = "";
+    errorText.style.visibility = "hidden";
+  });
+
+  document.getElementById("nextBtn").onclick = () => {
+    const input = document.getElementById("fieldInput").value.trim();
+
+    if (!input) {
+      errorText.innerText = "This field cannot be empty.";
+      errorText.style.visibility = "visible";
+      return;
+    }
+
+    formData[field] = input;
+    currentStep++;
+
+    if (currentStep < fields.length) {
+      renderStep();
+    } else {
+      localStorage.setItem("autofillData", JSON.stringify(formData));
+      showAutofillUI();
+    }
+  };
+}
+
+function showAutofillUI() {
+  const content = document.getElementById("content");
+
+  content.innerHTML = `
+    <button id="autofillButton">Autofill</button>
+    <div class="small-link" id="updateData">Update autofill data</div>
+  `;
+
   document
     .getElementById("autofillButton")
     .addEventListener("click", function () {
@@ -37,4 +107,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
-});
+
+  document.getElementById("updateData").onclick = () => {
+    formData = JSON.parse(localStorage.getItem("autofillData") || "{}");
+    currentStep = 0;
+    renderStep();
+  };
+}
+
+function render() {
+  const data = localStorage.getItem("autofillData");
+  if (data) {
+    formData = JSON.parse(data);
+    showAutofillUI();
+  } else {
+    renderStep();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", render);

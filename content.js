@@ -277,7 +277,7 @@ const autofillData = {
   endYear: 2025,
   linkedin: "https://www.linkedin.com/in/msvishal",
   website: "https://vishalms.com",
-  disability: "No, I do not have a disability",
+  disability: "No, I do not have a disability and have not had one in the past",
   sponsorship: "Yes",
   authorization: "Yes",
   relocation: "Yes",
